@@ -11,7 +11,7 @@ from wtforms import StringField, SubmitField
 
 
 class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'HELLO')
 
 
 app = Flask(__name__, template_folder='html')
@@ -33,8 +33,8 @@ class Response(FlaskForm):
 
 def score_text(text):
     try:
-        model = pickle.load(open("logreg.pkl", "rb"))
-        tfidf = pickle.load(open("tf-idf.pkl", "rb"))
+        model = pickle.load(open("data/logreg.pkl", "rb"))
+        tfidf = pickle.load(open("data/tf-idf.pkl", "rb"))
 
         score = model.predict_proba(tfidf.transform([text]))[0][1]
         sentiment = 'positive' if score > 0.5 else 'negative'
@@ -72,7 +72,7 @@ def get_text_score():
     form = TextForm()
     if form.validate_on_submit():
         score, sentiment = score_text(form.text.data)
-        form.text.data = 'ytkkava'
+        form.text.data = ''
         return redirect(url_for('get_result', score=score, sentiment=sentiment))
 
     return render_template('from_form.html', form=form)
