@@ -10,13 +10,9 @@ from wtforms.validators import DataRequired
 from wtforms import StringField, SubmitField
 
 
-class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'HELLO')
-
-
 app = Flask(__name__, template_folder='html')
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
-app.config.from_object(Config)
+app.config['SECRET_KEY'] = 'hello'
 Bootstrap(app)
 
 
@@ -38,8 +34,8 @@ def score_text(text):
 
         score = model.predict_proba(tfidf.transform([text]))[0][1]
         sentiment = 'positive' if score > 0.5 else 'negative'
-    except Exception as e:
-        print(str(e))
+    except Exception as exc:
+        app.logger.info('Exception: {0}'.format(exc))
         score, sentiment = 0.0, 'unknown'
 
     return score, sentiment
@@ -53,28 +49,33 @@ def get_index():
 
 @app.route('/result', methods=['GET', 'POST'])
 def get_result():
-    response = Response()
+    try:
+        response = Response()
 
-    if response.validate_on_submit():
-        return redirect(url_for('get_text_score'))
+        if response.validate_on_submit():
+            return redirect(url_for('get_text_score'))
 
-    score = request.args.get('score')
-    sentiment = request.args.get('sentiment')
+        score = request.args.get('score')
+        sentiment = request.args.get('sentiment')
 
-    response.score.data = score
-    response.sentiment.data = sentiment
+        response.score.data = score
+        response.sentiment.data = sentiment
 
-    return render_template('from_form.html', form=response)
+        return render_template('from_form.html', form=response)
+    except Exception as exc:
+        app.logger.info('Exception: {0}'.format(exc))
 
 
 @app.route('/sentiment', methods=['GET', 'POST'])
 def get_text_score():
-    form = TextForm()
-    if form.validate_on_submit():
-        score, sentiment = score_text(form.text.data)
-        form.text.data = ''
-        return redirect(url_for('get_result', score=score, sentiment=sentiment))
-
-    return render_template('from_form.html', form=form)
-
-
+    try:
+        form = TextForm()
+        if form.validate_on_submit():
+            app.logger.info('On text: {0}'.format(form.text.data))
+            score, sentiment = score_text(form.text.data)
+            app.logger.info("Score: {0:.3f}, Sentiment: {1}".format(score, sentiment))
+            form.text.data = ''
+            return redirect(url_for('get_result', score=score, sentiment=sentiment))
+        return render_template('from_form.html', form=form)
+    except Exception as exc:
+        app.logger.info('Exception: {0}'.format(exc))
