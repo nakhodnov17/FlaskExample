@@ -13,6 +13,7 @@ from wtforms import StringField, SubmitField
 app = Flask(__name__, template_folder='html')
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SECRET_KEY'] = 'hello'
+data_path = './../data'
 Bootstrap(app)
 
 
@@ -29,8 +30,8 @@ class Response(FlaskForm):
 
 def score_text(text):
     try:
-        model = pickle.load(open("data/logreg.pkl", "rb"))
-        tfidf = pickle.load(open("data/tf-idf.pkl", "rb"))
+        model = pickle.load(open(os.path.join(data_path, "logreg.pkl"), "rb"))
+        tfidf = pickle.load(open(os.path.join(data_path, "tf-idf.pkl"), "rb"))
 
         score = model.predict_proba(tfidf.transform([text]))[0][1]
         sentiment = 'positive' if score > 0.5 else 'negative'
