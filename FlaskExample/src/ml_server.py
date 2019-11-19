@@ -1,6 +1,7 @@
 import os
 import pickle
 
+from collections import namedtuple
 from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
 from flask import Flask, request, url_for
