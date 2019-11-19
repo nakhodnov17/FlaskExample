@@ -15,6 +15,12 @@ app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SECRET_KEY'] = 'hello'
 data_path = './../data'
 Bootstrap(app)
+messages = []
+
+
+class Message:
+    header = ''
+    text = ''
 
 
 class TextForm(FlaskForm):
@@ -44,8 +50,32 @@ def score_text(text):
 
 @app.route('/')
 @app.route('/index')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/index_js')
 def get_index():
     return '<html><center><script>document.write("Hello, i`am Flask Server!")</script></center></html>'
+
+
+@app.route('/clear_messages', methods=['POST'])
+def clear_messages():
+    messages.clear()
+    return redirect(url_for('prepare_message'))
+
+
+@app.route('/messages', methods=['GET', 'POST'])
+def prepare_message():
+    message = Message()
+
+    if request.method == 'POST':
+        message.header, message.text = request.form['header'], request.form['text']
+        messages.append(message)
+
+        return redirect(url_for('prepare_message'))
+
+    return render_template('messages.html', messages=messages)
 
 
 @app.route('/result', methods=['GET', 'POST'])
