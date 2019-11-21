@@ -1,5 +1,9 @@
-1. Чтобы собрать докер образ 
-docker build -t repo_name/image_name:image_tag .
-2. Чтобы его запустить
-docker run -p 5000:5000 -v "$PWD/FlaskExample/data:/root/FlaskExample/data" repo_name/image_name
+* Полезные ссылки 
+    * https://wiki.cmc.msu.ru/ 
+    * https://portal.azure.com/#home 
+    * https://colab.research.google.com/ 
+    
+* Docker
+    1. Чтобы собрать докер образ: `docker build -t repo_name/image_name:image_tag .`
+    2. Чтобы его запустить: `docker run -p 5000:5000 -v "$PWD/FlaskExample/data:/root/FlaskExample/data" repo_name/image_name`
 
