@@ -1,13 +1,8 @@
-FROM ubuntu
+FROM python:3-slim
 
-WORKDIR /root
+COPY FlaskExample/src /root/FlaskExample/src
 
-RUN apt update && apt install -y g++ gcc python3 python3-pip git
-
-RUN mkdir ./FlaskExample
-COPY FlaskExample/src ./FlaskExample/src
-
-RUN chown -R root:root ./FlaskExample
+RUN chown -R root:root /root/FlaskExample
 
 WORKDIR /root/FlaskExample/src
 RUN pip3 install -r requirements.txt
