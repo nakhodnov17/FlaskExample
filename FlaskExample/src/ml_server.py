@@ -82,18 +82,18 @@ def prepare_message():
 @app.route('/result', methods=['GET', 'POST'])
 def get_result():
     try:
-        response = Response()
+        response_form = Response()
 
-        if response.validate_on_submit():
+        if response_form.validate_on_submit():
             return redirect(url_for('get_text_score'))
 
         score = request.args.get('score')
         sentiment = request.args.get('sentiment')
 
-        response.score.data = score
-        response.sentiment.data = sentiment
+        response_form.score.data = score
+        response_form.sentiment.data = sentiment
 
-        return render_template('from_form.html', form=response)
+        return render_template('from_form.html', form=response_form)
     except Exception as exc:
         app.logger.info('Exception: {0}'.format(exc))
 
@@ -101,13 +101,14 @@ def get_result():
 @app.route('/sentiment', methods=['GET', 'POST'])
 def get_text_score():
     try:
-        form = TextForm()
-        if form.validate_on_submit():
-            app.logger.info('On text: {0}'.format(form.text.data))
-            score, sentiment = score_text(form.text.data)
+        text_form = TextForm()
+
+        if text_form.validate_on_submit():
+            app.logger.info('On text: {0}'.format(text_form.text.data))
+            score, sentiment = score_text(text_form.text.data)
             app.logger.info("Score: {0:.3f}, Sentiment: {1}".format(score, sentiment))
-            form.text.data = ''
+            text_form.text.data = ''
             return redirect(url_for('get_result', score=score, sentiment=sentiment))
-        return render_template('from_form.html', form=form)
+        return render_template('from_form.html', form=text_form)
     except Exception as exc:
         app.logger.info('Exception: {0}'.format(exc))
