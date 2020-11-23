@@ -5,14 +5,14 @@
     <title>Main page</title>
 </head>
 
-<form method="post" action="/messages">
+<form method="post" action="{{ url_for('prepare_message') }}">
     <input type="text" name="header">
     <input type="text" name="text">
     <input type="text" name="text_2">
     <button type="submit">Отправить сообщение</button>
 </form>
 
-<form method="post" action="/clear_messages">
+<form method="post" action="{{ url_for('clear_messages') }}">
     <button type="submit">Отчистить сообщение</button>
 </form>
 
