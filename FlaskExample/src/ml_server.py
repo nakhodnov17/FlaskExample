@@ -8,7 +8,7 @@ from flask import Flask, request, url_for
 from flask import render_template, redirect
 
 from wtforms.validators import DataRequired
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, FileField
 
 
 app = Flask(__name__, template_folder='html')
@@ -35,6 +35,11 @@ class Response(FlaskForm):
     submit = SubmitField('Try Again')
 
 
+class FileForm(FlaskForm):
+    file_path = FileField('Path', validators=[DataRequired()])
+    submit_1 = SubmitField('Open File')
+
+
 def score_text(text):
     try:
         model = pickle.load(open(os.path.join(data_path, "logreg.pkl"), "rb"))
@@ -47,6 +52,20 @@ def score_text(text):
         score, sentiment = 0.0, 'unknown'
 
     return score, sentiment
+
+
+@app.route('/file', methods=['GET', 'POST'])
+def file():
+    file_form = FileForm()
+
+    if request.method == 'POST' and file_form.validate_on_submit():
+        for idx, line in enumerate(file_form.file_path.data.stream):
+            print(line)
+            if idx > 0:
+                break
+        return redirect(url_for('file'))
+
+    return render_template('from_form.html', form=file_form)
 
 
 @app.route('/')
