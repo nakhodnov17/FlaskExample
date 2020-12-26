@@ -7,6 +7,7 @@ from flask_bootstrap import Bootstrap
 from flask import Flask, request, url_for
 from flask import render_template, redirect
 
+from flask_wtf.file import FileAllowed
 from wtforms.validators import DataRequired
 from wtforms import StringField, SubmitField, FileField
 
@@ -36,8 +37,11 @@ class Response(FlaskForm):
 
 
 class FileForm(FlaskForm):
-    file_path = FileField('Path', validators=[DataRequired()])
-    submit_1 = SubmitField('Open File')
+    file_path = FileField('Path', validators=[
+        DataRequired('Specify file'),
+        FileAllowed(['csv'], 'CSV only!')
+    ])
+    submit = SubmitField('Open File')
 
 
 def score_text(text):
@@ -59,10 +63,8 @@ def file():
     file_form = FileForm()
 
     if request.method == 'POST' and file_form.validate_on_submit():
-        for idx, line in enumerate(file_form.file_path.data.stream):
-            print(line)
-            if idx > 0:
-                break
+        lines = file_form.file_path.data.stream.readlines()
+        print(f'Uploaded {len(lines)} lines')
         return redirect(url_for('file'))
 
     return render_template('from_form.html', form=file_form)
